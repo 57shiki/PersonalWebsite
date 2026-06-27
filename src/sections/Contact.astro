@@ -1,0 +1,44 @@
+---
+import SectionHeading from "../components/SectionHeading.astro";
+import ContactForm from "../components/ContactForm.tsx";
+import { profile } from "../data/profile";
+---
+
+<section id="contact" class="border-border/60 bg-surface/40 border-t">
+  <div class="mx-auto max-w-5xl px-6 py-20">
+    <SectionHeading id="contact-heading" title="Get in touch" />
+
+    <div class="grid gap-10 md:grid-cols-[1fr_1.2fr]">
+      <div class="flex flex-col gap-4">
+        <p class="text-muted text-lg">
+          Have a role, a project, or just want to say hi? Drop me a line — I
+          read everything.
+        </p>
+        <a
+          href={`mailto:${profile.email}`}
+          class="text-accent-strong hover:text-text font-mono transition-colors"
+        >
+          {profile.email}
+        </a>
+        <ul class="flex items-center gap-5">
+          {
+            profile.socials.map((s) => (
+              <li>
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-muted hover:text-text font-mono text-sm transition-colors"
+                >
+                  {s.label} ↗
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <ContactForm client:visible />
+    </div>
+  </div>
+</section>

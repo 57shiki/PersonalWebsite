@@ -1,0 +1,31 @@
+---
+import SectionHeading from "../components/SectionHeading.astro";
+import { profile } from "../data/profile";
+
+const facts = [
+  { label: "Role", value: profile.role },
+  { label: "Focus", value: "Web apps & APIs" },
+  { label: "Interests", value: "Photography, travel, food" },
+];
+---
+
+<section id="about" class="mx-auto max-w-5xl px-6 py-20">
+  <SectionHeading id="about-heading" title="A bit about me" />
+  <div class="grid gap-10 md:grid-cols-[2fr_1fr]">
+    <p class="text-muted text-lg leading-relaxed">
+      {profile.intro}
+    </p>
+    <dl class="flex flex-col">
+      {
+        facts.map((f) => (
+          <div class="border-border flex items-baseline justify-between gap-4 border-t py-3 first:border-t-0 first:pt-0">
+            <dt class="text-accent-strong font-mono text-xs tracking-wide uppercase">
+              {f.label}
+            </dt>
+            <dd class="text-text text-right">{f.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
