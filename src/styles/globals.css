@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* Dark mode driven by a [data-theme="dark"] attribute on <html>. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---- Design tokens (warm editorial palette) ---- */
+:root {
+  --bg: #f1ede6; /* lightest cream */
+  --surface: #ebe3db; /* cards / secondary surfaces */
+  --border: #d1c7bd; /* borders, dividers, muted UI */
+  --accent: #cbad8d; /* primary accent */
+  --accent-strong: #a48374; /* hover/active accent, secondary text */
+  --text: #3a2d28; /* primary text (espresso) */
+  --muted: #6e5a50; /* muted body text on light bg (AA on cream) */
+}
+
+[data-theme="dark"] {
+  --bg: #2a201c;
+  --surface: #3a2d28;
+  --border: #5c4a42;
+  --accent: #cbad8d;
+  --accent-strong: #d1c7bd;
+  --text: #f1ede6;
+  --muted: #cbbfb6;
+}
+
+/* Expose tokens as Tailwind theme colors (inline = resolve via var() so they
+   react to theme switching at runtime). */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+
+  /* Font families resolve to the self-hosted faces wired up via the Astro
+     Fonts API (astro.config.mjs + <Font> in BaseLayout). Each cssVariable
+     already carries a metric-matched fallback stack. */
+  --font-sans: var(--font-hanken-grotesk, system-ui, sans-serif);
+  --font-mono: var(--font-jetbrains-mono, ui-monospace, monospace);
+
+  /* ---- Modular type scale (brand: fluid display, ≥1.25 ratio) ----
+     Fluid headings via clamp(); body stays fixed for predictable measure. */
+  --text-display: clamp(2.25rem, 1.35rem + 3.9vw, 3.75rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.028em;
+  --text-display--font-weight: 600;
+
+  --text-h2: clamp(1.75rem, 1.3rem + 1.9vw, 2.5rem);
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: -0.022em;
+  --text-h2--font-weight: 600;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem; /* offset for sticky nav on anchor jumps */
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
+  font-kerning: normal;
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1;
+}
+
+/* Headings balance their line breaks; long prose avoids orphans. */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Accessible focus ring using the strong accent. */
+:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
