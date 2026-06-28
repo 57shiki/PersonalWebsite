@@ -7,3 +7,6 @@
 ---
 
 <!-- Add instructions below, one per line. -->
+Surface the harder technical decisions in the README (OIDC CI/CD setup, no-runtime image pipeline, island hydration strategy).
+Add a "Notable implementation details" section to the README with 3–5 non-obvious implementation highlights.
+Mention performance outcomes in the README (Lighthouse score or Core Web Vitals numbers).
