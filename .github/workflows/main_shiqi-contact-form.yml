@@ -53,6 +53,7 @@ jobs:
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
+      actions: read #This is required to download artifacts
 
     steps:
       - name: Download artifact from build job
@@ -64,7 +65,7 @@ jobs:
         run: |
           unzip release.zip
           rm release.zip
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -78,5 +79,5 @@ jobs:
         with:
           app-name: 'shiqi-contact-form'
           slot-name: 'Production'
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          package: '.'
           
