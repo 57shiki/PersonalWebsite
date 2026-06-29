@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js project to Azure Function App - shiqi-contact-form
+name: Contact Form Func - shiqi-contact-form
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
           popd
 
       - name: Zip artifact for deployment
-        run: cd api && zip -r ../release.zip .
+        run: zip -r ../release.zip .
         working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
 
       - name: Upload artifact for deployment job
