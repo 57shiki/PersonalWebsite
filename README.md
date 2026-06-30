@@ -1,8 +1,8 @@
 # shiqihu.com — Personal Portfolio
 
-The code behind my corner of the internet — engineering work I'm proud of, photos I've taken, and a form you can use to reach me.
+The code behind my corner of the internet: engineering work I'm proud of, photos I've taken, and a form you can use to reach me.
 
-Built for speed: fully static HTML/CSS at load time, with JavaScript only where interaction is needed — powered by Astro and React islands, deployed on Cloudflare Workers with a serverless contact API and a Cloudflare R2 image pipeline.
+Built for speed: fully static HTML/CSS at load time, with JavaScript only where interaction is needed. Powered by Astro and React islands, deployed on Cloudflare Workers with a serverless contact API and a Cloudflare R2 image pipeline.
 
 ## [→ Visit shiqihu.com](https://shiqihu.com)
 
@@ -23,7 +23,7 @@ Built for speed: fully static HTML/CSS at load time, with JavaScript only where 
 | Layer | Technology | Why |
 | --- | --- | --- |
 | Framework | **Astro 7** | Static-first, ships zero JavaScript by default; fast loads and strong SEO out of the box. |
-| Interactivity | **React 19 islands** | Interactive pieces (theme toggle, gallery lightbox, contact form) hydrate independently — JS is scoped to where it's needed. |
+| Interactivity | **React 19 islands** | Interactive pieces (theme toggle, gallery lightbox, contact form) hydrate independently; JS is scoped to where it's needed. |
 | Language | **TypeScript (strict)** | End-to-end type safety across UI, data, and the serverless API. |
 | Styling | **Tailwind CSS v4** | Utility-first styling with a single design-token source of truth (CSS variables) driving light/dark themes. |
 | Animation | **Motion** | Subtle, accessible entrance and hover motion; respects `prefers-reduced-motion`. |
@@ -36,7 +36,7 @@ Built for speed: fully static HTML/CSS at load time, with JavaScript only where 
 
 **Astro over a React-based meta-framework (Next.js / Remix)**
 
-A portfolio is almost entirely static content — the trade-off is straightforward. Next.js ships a JS runtime and hydrates the full page by default; every visitor pays that cost even when they're just reading text. Astro flips the default: pages are pure HTML/CSS, and JavaScript is opt-in per component via islands. The result is a significantly smaller JS bundle and faster Time to Interactive, with no meaningful loss of capability for this use case. React is still used where it earns its keep — the theme toggle, gallery lightbox, and contact form — but it doesn't come along for the ride everywhere else.
+A portfolio is almost entirely static content, so the trade-off is straightforward. Next.js ships a JS runtime and hydrates the full page by default; every visitor pays that cost even when they're just reading text. Astro flips the default: pages are pure HTML/CSS, and JavaScript is opt-in per component via islands. The result is a significantly smaller JS bundle and faster Time to Interactive, with no meaningful loss of capability for this use case. React is still used where it earns its keep (the theme toggle, gallery lightbox, and contact form) but it doesn't come along for the ride everywhere else.
 
 ## Architecture
 
@@ -45,8 +45,7 @@ flowchart LR
     Visitor(["👤 Visitor"])
 
     subgraph CF["Cloudflare"]
-        Worker["Workers (edge)\nAstro site"]
-        PagesFunc["Pages Function\n/api/contact\n(proxy)"]
+        Worker["Workers (edge)\nAstro site + /api/contact proxy"]
         R2["R2\nAVIF/WebP photos"]
     end
 
@@ -56,31 +55,38 @@ flowchart LR
     end
 
     Visitor -- HTTPS --> Worker
-    Visitor -- "POST /api/contact" --> PagesFunc
     Visitor -- "img srcset (direct)" --> R2
-    PagesFunc -- "proxy + X-Internal-Secret" --> Func
+    Worker -- "proxy + X-Internal-Secret" --> Func
     Func --> Email
 ```
 
 - **Cloudflare Workers** serves the Astro-built site at the edge (`wrangler deploy`).
-- **Cloudflare R2** hosts responsive AVIF/WebP photo variants; the browser fetches them directly via `<img srcset>` — no runtime image processing.
+- **Cloudflare R2** hosts responsive AVIF/WebP photo variants; the browser fetches them directly via `<img srcset>`, with no runtime image processing.
 - **Azure Functions** is a separate deployment (`api/`) that handles contact form submissions, validates input, and sends email via Resend.
 
 ## Notable implementation details
-**Contact form: hidden backend URL + shared secret**
 
-The Azure Functions URL is never exposed in the client bundle or the repository. The contact form posts to `/api/contact`, which is handled by a Cloudflare Pages Function (`functions/api/contact.ts`). The Pages Function reads the real Azure Functions URL and a shared secret from Cloudflare's encrypted environment variables at runtime, injects the secret as an `X-Internal-Secret` header, and proxies the request. Azure Functions rejects any request that omits or provides the wrong secret — so even if someone discovers the Azure URL, they cannot use it.
+**Contact form: two-layer serverless architecture**
+
+The contact form uses a deliberate split between Cloudflare and Azure to keep all secrets and logic off the client.
+
+*Request flow:* the React form `POST`s to `/api/contact` on the Cloudflare Worker. The Worker (`src/pages/api/contact.ts`) is a thin proxy that forwards the request body to Azure Functions and injects an `X-Internal-Secret` header read from a Cloudflare Worker secret. Azure Functions (`api/src/functions/contact.ts`) does all the real work: it validates the secret, sanitises input, applies spam protection, and sends the email via Resend.
+
+*Why two layers?*
+- The Azure Functions URL and the Resend API key never reach the browser or the repository.
+- The shared secret (`CONTACT_FORM_SECRET`) means even if someone discovers the Azure URL directly, every request without the correct secret is rejected with a 403. The Worker is the only authorised caller.
+- Keeping validation and email-sending in Azure decouples them from the Cloudflare deployment cycle.
 
 **Spam protection**
 
 Two layers defend the contact endpoint without requiring a CAPTCHA:
 
-- *Honeypot field* — a hidden input is present in the form markup but invisible and unfocusable to real users. Bots that auto-fill forms trigger it; the server silently returns a 200 so bots don't learn they were caught.
-- *In-memory rate limiter* — the Azure Function tracks submission timestamps per client IP and rejects requests that exceed a fixed threshold with a 429.
+- *Honeypot field*: a hidden `company` input is invisible and unfocusable to real users. Bots that auto-fill forms trigger it; Azure silently returns 200 so bots don't learn they were caught.
+- *In-memory rate limiter*: the Azure Function tracks submission timestamps per client IP (max 5 per 10 minutes) and rejects excess requests with a 429.
 
 **Email cap fallback**
 
-When the Resend API returns a 429 (monthly send limit reached), the server responds with a machine-readable `EMAIL_CAP_REACHED` error rather than a generic failure. The contact form detects this and renders a dedicated state that surfaces the author's direct email address, so the form degrading never leaves a visitor without a way to reach out.
+When Resend returns a 429 (monthly send limit reached on the free tier), Azure responds with a machine-readable `EMAIL_CAP_REACHED` error. The contact form detects this and renders a dedicated state that surfaces the author's direct email address, so a degraded form never leaves a visitor with no way to reach out.
 
 ## Project structure
 
