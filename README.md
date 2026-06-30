@@ -48,12 +48,12 @@ flowchart LR
     Visitor(["👤 Visitor"])
 
     subgraph CF["Cloudflare"]
-        Worker["Workers (edge)\nAstro site + /api/contact proxy"]
-        R2["R2\nAVIF/WebP photos"]
+        Worker["Workers (edge)<br/>Astro site + /api/contact proxy"]
+        R2["R2<br/>AVIF/WebP photos"]
     end
 
     subgraph AZ["Azure"]
-        Func["Functions\n/api/contact"]
+        Func["Functions<br/>/api/contact"]
         Email["📧 Resend (email)"]
     end
 
@@ -131,7 +131,7 @@ Runtime configuration is provided through environment variables (see `.env.examp
 
 ## Testing
 
-The contact feature — the only stateful, user-facing piece with a real backend — has two layers of automated tests. Everything else on the site is static content with no branching logic worth testing.
+The contact feature is the only stateful, user-facing piece with a real backend, so it carries two layers of automated tests. The rest of the site is static content rendered at build time, with no runtime branching to exercise.
 
 ```bash
 npm test              # run both layers
@@ -141,9 +141,9 @@ npm run test:e2e      # E2E tests only
 
 ### What is tested
 
-**Contact form UI (`ContactForm.tsx`)** — client-side validation (empty fields, invalid email), the honeypot field, button state during in-flight requests, and all four terminal UI states: idle, submitting, success, error, and email-cap fallback.
+**Contact form UI (`ContactForm.tsx`):** client-side validation (empty fields, invalid email), the honeypot field, button state during in-flight requests, and every UI state it renders: idle, submitting, success, error, and the email-cap fallback.
 
-**Contact API (`/api/contact`)** — server-side input validation (missing fields, bad email, length limits), honeypot silent-accept, in-memory rate limiting (per-IP window), environment variable guards, and the full Resend integration (correct payload shape, upstream 401/429/network-error handling).
+**Contact API (`/api/contact`):** the handler is a thin proxy to the Azure Function, which owns validation, rate limiting, and Resend delivery. Its tests verify the proxy contract: forwarding to `AZURE_CONTACT_URL` with the internal secret header, request-body pass-through, and faithful pass-through of Azure's status and body (success plus 400 validation, 429 rate-limit, 503 `EMAIL_CAP_REACHED`, and 502 upstream errors).
 
 A full test case catalogue is in [tests/README.md](tests/README.md).
 
@@ -151,10 +151,14 @@ A full test case catalogue is in [tests/README.md](tests/README.md).
 
 **Unit tests** exercise each layer in isolation, keeping feedback instant and failures easy to locate:
 
-- The React component is rendered into a virtual DOM (jsdom). `fetch` is stubbed so state changes are driven by controlled mock responses — no server needed.
-- The API handler is called directly as a TypeScript function, bypassing HTTP entirely. The Cloudflare `env` binding and `fetch` are both stubbed, so every branch can be reached without a running Worker.
+- The React component renders into a virtual DOM (jsdom), with `fetch` stubbed so state transitions are driven entirely by controlled mock responses.
+- The Worker handler runs directly as a TypeScript function, bypassing HTTP; the Cloudflare `env` binding and `fetch` are both stubbed, so every branch is reachable without a running Worker.
 
-**End-to-end tests** run a real Chromium browser against the live Astro dev server. `/api/contact` is intercepted by Playwright's network layer before it leaves the browser, so no emails are sent. The test helper waits for `form[data-hydrated]` — an attribute set by `useEffect` after React mounts — before interacting, which prevents the race condition where the SSR'd HTML is visible but event handlers are not yet attached.
+**End-to-end tests** drive the assembled feature in a real browser, catching wiring and hydration bugs that isolated tests cannot:
+
+- A real Chromium instance runs against the live Astro dev server, which Playwright starts automatically.
+- `/api/contact` is intercepted at Playwright's network layer before any request leaves the browser, so no emails are sent.
+- The helper waits for `form[data-hydrated]` (an attribute set by `useEffect` after React mounts) before interacting, avoiding the race where server-rendered HTML is visible but event handlers are not yet attached.
 
 ### Tool choices
 
