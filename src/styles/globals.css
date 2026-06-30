@@ -54,6 +54,23 @@
   --text-h2--font-weight: 600;
 }
 
+/* Self-hosted subset (only 世 + 祺) for the bilingual brand mark. ~1KB woff2;
+   unicode-range scopes the face to those two glyphs so it never loads for
+   anything else. Built from Noto Serif SC, weight 600 to match the mark. */
+@font-face {
+  font-family: "Noto Serif SC";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/noto-serif-sc-subset.woff2") format("woff2");
+  unicode-range: U+4e16, U+797a;
+}
+
+.bilingual-name {
+  font-family: "Noto Serif SC", serif;
+  letter-spacing: 0.12em;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem; /* offset for sticky nav on anchor jumps */

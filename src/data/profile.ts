@@ -8,6 +8,7 @@ export interface SocialLink {
 export interface Profile {
   name: string;
   shortName: string;
+  bilingualName: string;
   /** Concrete title used in the page <title> and metadata. */
   role: string;
   /** Expansive, multi-faceted label shown as the hero eyebrow. */
@@ -25,6 +26,7 @@ export interface Profile {
 export const profile: Profile = {
   name: "Shiqi Hu",
   shortName: "Steven",
+  bilingualName: "世祺",
   role: "Software Engineer",
   eyebrow: "Engineer · Photographer · Explorer",
 

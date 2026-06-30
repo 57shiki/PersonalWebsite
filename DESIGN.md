@@ -42,6 +42,10 @@ typography:
     fontWeight: 400
     letterSpacing: "0.08em"
     fontFeature: '"liga" 1, "calt" 1'
+  bilingualMark:
+    fontFamily: "Noto Serif SC, serif"
+    fontWeight: 600
+    note: "Self-hosted ~1KB woff2 subset (only 世 + 祺), unicode-range scoped. Brand wordmark CJK glyphs only."
 rounded:
   sm: "0.5rem"
   md: "0.75rem"
@@ -142,6 +146,7 @@ A single-family palette of warm neutrals with one earthy accent. Every color bel
 
 **Body/Heading Font:** Hanken Grotesk (weights 400 / 500 / 600), self-hosted via the Astro Fonts API with a metric-matched system-ui fallback.
 **Label/Mono Font:** JetBrains Mono (weights 400 / 500), self-hosted, used only for labels.
+**Bilingual Mark:** Noto Serif SC (weight 600), self-hosted as a ~1KB woff2 subset containing only the two wordmark glyphs (世 + 祺), `unicode-range`-scoped so it never loads for any other character. Used exclusively for the CJK brand mark in the nav.
 
 **Character:** One warm humanist grotesque carries the entire hierarchy — the closest free analog to Apple's San Francisco, with a touch more warmth in the curves. A single family in three weights creates cleaner hierarchy than a competing pair, and matches the "content earns its space" principle: the type is confident enough not to call attention to itself. JetBrains Mono is the only second face, and it earns its place as a precision instrument on tech tags and the wordmark — never as a costume.
 
