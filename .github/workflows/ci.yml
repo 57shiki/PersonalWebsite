@@ -39,3 +39,4 @@ jobs:
       - run: npm run test:e2e
         env:
           CI: "true"
+          CLOUDFLARE_API_TOKEN: ${{ secrets.WORKER_SCRIPT_TOKEN }}
