@@ -4,11 +4,13 @@ import Gallery from "../components/Gallery.tsx";
 import { photos } from "../data/photos";
 ---
 
-<section id="photography" class="mx-auto max-w-5xl px-6 py-20">
-  <SectionHeading id="photography-heading" title="Through the lens" />
-  <p class="text-muted mb-10 max-w-2xl text-lg">
-    When I step away from the keyboard, I'm usually out shooting. A few frames
-    I'm fond of.
-  </p>
-  <Gallery photos={photos} client:visible />
+<section id="photography" class="border-border/60 bg-surface/40 border-t">
+  <div class="mx-auto max-w-5xl px-6 py-20">
+    <SectionHeading id="photography-heading" title="Through the lens" />
+    <p class="text-muted mb-10 max-w-2xl text-lg">
+      When I step away from the keyboard, I'm usually out shooting. A few frames
+      I'm fond of.
+    </p>
+    <Gallery photos={photos} client:visible />
+  </div>
 </section>

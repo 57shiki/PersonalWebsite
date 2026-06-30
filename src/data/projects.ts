@@ -1,4 +1,4 @@
-import { GITHUB_URL } from "./social";
+import { GITHUB_URL, WEBSITE_REPO_RELATIVE_NAME } from "./social";
 
 export interface Project {
   title: string;
@@ -26,7 +26,7 @@ export const projects: Project[] = [
       "Azure Functions",
       "Cloudflare R2",
     ],
-    repoUrl: GITHUB_URL,
+    repoUrl: `${GITHUB_URL}/${WEBSITE_REPO_RELATIVE_NAME}`,
     featured: true,
   },
 ];

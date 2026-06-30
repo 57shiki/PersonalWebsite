@@ -8,7 +8,11 @@ export interface SocialLink {
 export interface Profile {
   name: string;
   shortName: string;
+  bilingualName: string;
+  /** Concrete title used in the page <title> and metadata. */
   role: string;
+  /** Expansive, multi-faceted label shown as the hero eyebrow. */
+  eyebrow: string;
   /** One-line value prop shown in the hero. */
   tagline: string;
   /** Slightly longer intro for the About section. */
@@ -22,12 +26,14 @@ export interface Profile {
 export const profile: Profile = {
   name: "Shiqi Hu",
   shortName: "Steven",
-  role: "Full Stack Engineer",
+  bilingualName: "世祺",
+  role: "Software Engineer",
+  eyebrow: "Engineer · Photographer · Explorer",
 
   tagline:
-    "I turn caffeine into clean commits and the occasional working feature.",
+    "Algorithms for efficiency. Apertures for aesthetics. Appetites for exploration.",
   intro:
-    "I'm Steven — a full stack engineer who likes building things that are fast, " +
+    "I'm Steven — a software engineer who likes building things that are fast, " +
     "reliable, and a little delightful. I care about clean architecture, sensible " +
     "trade-offs, and shipping. When I'm not writing code, I'm usually behind a camera.",
   email: "potters.redox5z@icloud.com",

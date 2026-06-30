@@ -15,6 +15,9 @@ Built for speed: fully static HTML/CSS at load time, with JavaScript only where 
 - [Local deployment instruction](#local-deployment-instruction)
 - [Configuration](#configuration)
 - [Testing](#testing)
+  - [What is tested](#what-is-tested)
+  - [How they are tested](#how-they-are-tested)
+  - [Tool choices](#tool-choices)
 - [License](#license)
 
 ## Tech stack
