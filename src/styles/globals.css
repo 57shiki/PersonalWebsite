@@ -103,6 +103,29 @@ p {
   to   { transform: translateX(-50%); }
 }
 
+/* Contact submit button: matches the hero "View work" CTA treatment —
+   warm-grain at rest, leather + parchment with an icon nudge on hover. */
+.send-btn {
+  background: var(--accent);
+  color: #2a201c;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.send-btn:hover:not(:disabled) {
+  background: #a48374;
+  color: #f1ede6;
+}
+
+.send-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.send-btn:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+
 /* Accessible focus ring using the strong accent. */
 :focus-visible {
   outline: 2px solid var(--accent-strong);
