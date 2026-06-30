@@ -8,15 +8,18 @@ Built for speed: fully static HTML/CSS at load time, with JavaScript only where 
 
 ## Table of contents
 
-- [Tech stack](#tech-stack)
-- [Key tradeoffs](#key-tradeoffs)
-- [Architecture](#architecture)
-- [Notable implementation details](#notable-implementation-details)
-- [Project structure](#project-structure)
-- [Local development](#local-development)
-- [Configuration](#configuration)
-- [Testing](#testing)
-- [License](#license)
+- [shiqihu.com — Personal Portfolio](#shiqihucom--personal-portfolio)
+  - [→ Visit shiqihu.com](#-visit-shiqihucom)
+  - [Table of contents](#table-of-contents)
+  - [Tech stack](#tech-stack)
+  - [Key tradeoffs](#key-tradeoffs)
+  - [Architecture](#architecture)
+  - [Notable implementation details](#notable-implementation-details)
+  - [Project structure](#project-structure)
+  - [Local deployment instruction](#local-deployment-instruction)
+  - [Configuration](#configuration)
+  - [Testing](#testing)
+  - [License](#license)
 
 ## Tech stack
 
@@ -86,7 +89,7 @@ Two layers defend the contact endpoint without requiring a CAPTCHA:
 
 **Email cap fallback**
 
-When Resend returns a 429 (monthly send limit reached on the free tier), Azure responds with a machine-readable `EMAIL_CAP_REACHED` error. The contact form detects this and renders a dedicated state that surfaces the author's direct email address, so a degraded form never leaves a visitor with no way to reach out.
+When the Resend API returns a 429 (monthly send limit reached on the free tier), Azure responds with a machine-readable `EMAIL_CAP_REACHED` error rather than a generic error. The contact form detects this and renders a dedicated state that surfaces an alternative email address, so a degraded form never leaves a visitor with no way to reach out.
 
 ## Project structure
 
