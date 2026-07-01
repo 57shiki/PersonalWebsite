@@ -6,23 +6,24 @@ const facts = [
   { label: "Role", value: profile.role },
   { label: "Focus", value: "Web apps & APIs" },
   { label: "Interests", value: "Photography, travel, food" },
+  { label: "Language", value: "English, Chinese, Italian, Japanese" }
 ];
 ---
 
 <section id="about" class="mx-auto max-w-5xl px-6 py-20">
   <SectionHeading id="about-heading" title="A bit about me" />
-  <div class="grid gap-10 md:grid-cols-[2fr_1fr]">
+  <div class="grid items-start gap-10 md:grid-cols-[3fr_2fr]">
     <p class="text-muted text-lg leading-relaxed">
       {profile.intro}
     </p>
-    <dl class="flex flex-col">
+    <dl class="grid grid-cols-2 gap-4">
       {
         facts.map((f) => (
-          <div class="border-border flex items-baseline justify-between gap-4 border-t py-3 first:border-t-0 first:pt-0">
+          <div class="border-border bg-surface/50 flex flex-col gap-1.5 rounded-xl border p-4">
             <dt class="text-accent-strong font-mono text-xs tracking-wide uppercase">
               {f.label}
             </dt>
-            <dd class="text-text text-right">{f.value}</dd>
+            <dd class="text-text">{f.value}</dd>
           </div>
         ))
       }
