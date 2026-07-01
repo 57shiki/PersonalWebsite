@@ -37,7 +37,7 @@ const websiteRepoUrl = `${GITHUB_URL}/${WEBSITE_REPO_RELATIVE_NAME}`;
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`${p.title} on GitHub`}
-                    class="hover:text-text transition-colors"
+                    class="hover:text-text -m-1 inline-flex h-6 w-6 items-center justify-center p-1 transition-colors"
                   >
                     <Github size={18} aria-hidden />
                   </a>
@@ -48,7 +48,7 @@ const websiteRepoUrl = `${GITHUB_URL}/${WEBSITE_REPO_RELATIVE_NAME}`;
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`${p.title} live site`}
-                    class="hover:text-text transition-colors"
+                    class="hover:text-text -m-1 inline-flex h-6 w-6 items-center justify-center p-1 transition-colors"
                   >
                     <ExternalLink size={18} aria-hidden />
                   </a>
@@ -111,6 +111,13 @@ const websiteRepoUrl = `${GITHUB_URL}/${WEBSITE_REPO_RELATIVE_NAME}`;
   const titleEl = document.getElementById("readme-title");
   const bodyEl = document.getElementById("readme-body");
   const closeBtn = document.getElementById("readme-close");
+
+  // The README's "visit the live site" link is meant for GitHub readers, not
+  // visitors already on the site — drop it from the in-page lightbox only.
+  bodyEl
+    ?.querySelector<HTMLAnchorElement>('a[href="https://shiqihu.com"]')
+    ?.closest("h1, h2")
+    ?.remove();
   const diagramDialog = document.getElementById(
     "diagram-dialog",
   ) as HTMLDialogElement | null;
