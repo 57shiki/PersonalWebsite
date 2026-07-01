@@ -39,7 +39,7 @@ export default function ThemeToggle() {
       onClick={() => setTheme(next)}
       aria-label={`Switch to ${next} mode`}
       title={`Switch to ${next} mode`}
-      className="border-border text-text hover:bg-surface inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors"
+      className="border-border text-text hover:bg-surface inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border transition-colors"
     >
       {theme === "light" ? (
         <Moon size={18} aria-hidden />
