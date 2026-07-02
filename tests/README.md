@@ -1,6 +1,8 @@
 # Test suite
 
-Two layers of automated testing cover the contact feature: unit tests for isolated logic and E2E tests for the integrated, in-browser experience.
+Two layers of automated testing: unit tests for isolated logic and E2E tests for the integrated, in-browser experience. Coverage spans the contact feature, the resume API route, the shared `lib/utils` helpers, the theme toggle, the photo gallery lightbox, and static-page smoke checks.
+
+CI (`.github/workflows/ci.yml`) runs three jobs on every PR to `main`: **Lint & Type Check** (`astro check` + `eslint`), **Unit Tests**, and **E2E Tests**.
 
 Run all tests:
 
@@ -69,6 +71,46 @@ Tests the `POST /api/contact` Cloudflare Worker handler directly, bypassing the 
 
 ---
 
+## Unit tests — `unit/resume-api.test.ts`
+
+Tests the `GET /api/resume` Cloudflare Worker handler directly. `env.RESUME_BUCKET` is mocked with a minimal R2-bucket-shaped stub so no real R2 access is made.
+
+| Test |
+|------|
+| Requests `resume.pdf` from the bucket |
+| Returns 200 with the object body and the PDF `Content-Type` / `Content-Disposition` / `Cache-Control` headers when the object is present |
+| Returns 404 `Not Found` when the object is missing |
+
+---
+
+## Unit tests — `unit/utils.test.ts`
+
+Pure helpers from `src/lib/utils.ts`, tested with no I/O or mocking.
+
+| Function | Coverage |
+|----------|----------|
+| `cx` | Joins truthy class names; drops `false`/`null`/`undefined`/empty strings |
+| `r2Srcset` | Builds one descriptor per configured width in the requested format |
+| `r2DefaultSrc` | Points at the largest variant; defaults to webp, honours explicit avif |
+| `wrapOffset` | Shortest circular offset for the carousel: identity, forward/backward distance, wrap-around, and the `(-total/2 … +total/2]` bound |
+
+---
+
+## Unit tests — `unit/theme-toggle.test.tsx`
+
+Tests the `ThemeToggle` React component in jsdom. It seeds its state from the `<html data-theme>` attribute (set before paint by the inline script in `BaseLayout`) and mirrors changes to the DOM and `localStorage`.
+
+| Test |
+|------|
+| Defaults to light when no `data-theme` is present |
+| Seeds dark state from an existing `data-theme="dark"` |
+| Mirrors the initial theme to the DOM and `localStorage` on mount |
+| Toggles light → dark, updating the label, DOM attribute, and `localStorage` |
+| Toggles back dark → light |
+| Still applies the theme to the DOM when `localStorage.setItem` throws (private mode) |
+
+---
+
 ## E2E tests — `e2e/contact.spec.ts`
 
 Full browser tests using Playwright (Chromium). The Astro dev server is started automatically. `/api/contact` is intercepted by Playwright's `page.route()`, so no real emails are sent. The helper `gotoContactForm` scrolls the contact section into view to trigger Astro's `client:visible` hydration and waits for `form[data-hydrated]` (set by `useEffect` after React mounts) before interacting.
@@ -99,3 +141,30 @@ Full browser tests using Playwright (Chromium). The Astro dev server is started 
 | ID | Test |
 |----|------|
 | 9 | A valid submission against a mocked 200 response shows `role="status"` and "Thanks" text |
+
+---
+
+## E2E tests — `e2e/gallery.spec.ts`
+
+Full browser tests for the photo gallery lightbox. The `openGallery` helper disables the strip's infinite CSS marquee animation (so its buttons are stable and clickable, and the track is pinned to photo index 0) then opens the first photo, retrying until Astro's `client:visible` island has hydrated. Photo captions identify which image is in focus after navigating.
+
+| ID | Test |
+|----|------|
+| G.1 | Clicking a strip photo opens the `role="dialog"` lightbox on that photo |
+| G.2 | `ArrowRight` advances to the next photo |
+| G.3 | `ArrowLeft` from the first photo wraps around to the last |
+| G.4 | The "Next photo" button advances to the following photo |
+| G.5 | `Escape` closes the lightbox |
+| G.6 | The "Close photo viewer" button dismisses the lightbox |
+
+---
+
+## E2E tests — `e2e/pages.spec.ts`
+
+Smoke tests for the static pages. `collectErrors` records uncaught exceptions and `console.error` calls (filtering out "Failed to load resource" noise from unconfigured static assets) so a page that throws on load fails the test.
+
+| ID | Test |
+|----|------|
+| P.1 | Home page returns 200, has title `Shiqi Hu (Steven)`, shows a résumé link to `/api/resume`, and logs no client-side errors |
+| P.2 | An unknown route returns a 404 status and renders the custom 404 page (title + "wandered off" heading + "Back home" link) |
+| P.3 | `/privacy-policy` returns 200 with a `Privacy Policy` title and `PRIVACY POLICY` heading, and logs no client-side errors |
