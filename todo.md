@@ -8,9 +8,9 @@
 
 <!-- Add instructions below, one per line. -->
 - Surface the harder technical decisions in the README (OIDC CI/CD setup, no-runtime image pipeline, island hydration strategy).
-- Add a "Notable implementation details" section to the README with 3–5 non-obvious implementation highlights.
 - Mention performance outcomes in the README (Lighthouse score or Core Web Vitals numbers).
+- Add feature: Add photo without touching code
+- Dynamically extract experience section from new resume uploaded in r2 that is connected to this page.
+- Extract skills and order them by significance in project using LLM
 
 ## Design TODO
-- light/dark mode button does not have cursor:pointer 
-- 

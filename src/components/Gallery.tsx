@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { isR2Photo, type Photo } from "../data/photos";
-import { r2DefaultSrc, r2Srcset } from "../lib/utils";
+import { r2DefaultSrc, r2Srcset, wrapOffset } from "../lib/utils";
 
 interface Props {
   photos: Photo[];
@@ -23,13 +23,6 @@ function PhotoSources({ photo, sizes }: { photo: Photo; sizes: string }) {
       <source type="image/webp" srcSet={r2Srcset(photo, "webp")} sizes={sizes} />
     </>
   );
-}
-
-// Shortest circular offset for wrapping carousel (-half … +half)
-function wrapOffset(i: number, active: number, total: number): number {
-  let d = ((i - active) % total + total) % total;
-  if (d > total / 2) d -= total;
-  return d;
 }
 
 export default function Gallery({ photos }: Props) {

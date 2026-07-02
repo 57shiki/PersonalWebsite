@@ -12,8 +12,6 @@ Built for speed: fully static HTML/CSS at load time, with JavaScript only where 
 - [Architecture](#architecture)
 - [Notable implementation details](#notable-implementation-details)
 - [Project structure](#project-structure)
-- [Local deployment instruction](#local-deployment-instruction)
-- [Configuration](#configuration)
 - [Testing](#testing)
   - [What is tested](#what-is-tested)
   - [How they are tested](#how-they-are-tested)
@@ -30,8 +28,8 @@ Built for speed: fully static HTML/CSS at load time, with JavaScript only where 
 | Styling | **Tailwind CSS v4** | Utility-first styling with a single design-token source of truth (CSS variables) driving light/dark themes. |
 | Animation | **Motion** | Subtle, accessible entrance and hover motion; respects `prefers-reduced-motion`. |
 | Icons | **lucide-react** | Tree-shakeable SVG icon set. |
-| Hosting & CI/CD | **Cloudflare Workers** | Global edge network, free SSL, deployed via `wrangler deploy` in GitHub Actions. |
-| API | **Azure Functions (Node 20, TS)** | The `/api/contact` endpoint validates input, applies a honeypot + rate limit, and sends email. |
+| Hosting & CI/CD | **Cloudflare Workers** | Global edge network, free SSL, deployed via `wrangler deploy`; pull requests run lint, type-check, and both test suites in GitHub Actions before merge. |
+| API | **Azure Functions (Node 24, TS)** | The `/api/contact` endpoint validates input, applies a honeypot + rate limit, and sends email. |
 | Media | **Cloudflare R2** | S3-compatible object storage serving a responsive AVIF/WebP image pipeline for the photography gallery. |
 
 ## Key tradeoffs
@@ -47,8 +45,9 @@ flowchart LR
     Visitor(["👤 Visitor"])
 
     subgraph CF["Cloudflare"]
-        Worker["Workers (edge)<br/>Astro site + /api/contact proxy"]
-        R2["R2<br/>AVIF/WebP photos"]
+        Worker["Workers (edge)<br/>Astro site + /api/contact proxy + /api/resume"]
+        Photos["R2 (public)<br/>AVIF/WebP photos"]
+        Resume["R2 (private)<br/>resume.pdf"]
     end
 
     subgraph AZ["Azure"]
@@ -57,13 +56,14 @@ flowchart LR
     end
 
     Visitor -- HTTPS --> Worker
-    Visitor -- "img srcset (direct)" --> R2
+    Visitor -- "img srcset (direct)" --> Photos
+    Worker -- "R2 binding (stream PDF)" --> Resume
     Worker -- "proxy + X-Internal-Secret" --> Func
     Func --> Email
 ```
 
-- **Cloudflare Workers** serves the Astro-built site at the edge (`wrangler deploy`).
-- **Cloudflare R2** hosts responsive AVIF/WebP photo variants; the browser fetches them directly via `<img srcset>`, with no runtime image processing.
+- **Cloudflare Workers** serves the Astro-built site at the edge (`wrangler deploy`) and hosts two API routes: `/api/contact` (proxied to Azure) and `/api/resume` (streams the PDF from the R2 binding).
+- **Cloudflare R2** serves media two ways: photos live in a public bucket the browser fetches directly via `<img srcset>` (no runtime image processing), while `resume.pdf` sits in a private bucket reachable only through the Worker's `RESUME_BUCKET` binding.
 - **Azure Functions** is a separate deployment (`api/`) that handles contact form submissions, validates input, and sends email via Resend.
 
 ## Notable implementation details
@@ -95,48 +95,19 @@ When the Resend API returns a 429 (monthly send limit reached on the free tier),
 ```
 src/
   components/   UI components (Astro) + React islands (.tsx)
-  sections/     Page sections (Hero, About, Experience, Projects, Skills, Photography, Contact)
+  sections/     Page sections (Hero, About, Experience, Projects, Photography, Contact)
   layouts/      BaseLayout.astro (meta / OG / SEO, no-flash theme)
-  data/         Content as typed data (profile, experience, projects, skills, photos)
+  data/         Content as typed data (profile, experience, projects, photos)
   lib/          Helpers (responsive-image srcset, nav config)
   styles/       globals.css (Tailwind + design tokens)
-  pages/        index.astro, 404.astro
+  pages/        Base Layout, 404, Privacy Policy
 api/            Azure Functions (contact endpoint)
 scripts/        optimize-and-upload-photos.ts (sharp → AVIF/WebP → R2)
 ```
 
-## Local deployment instruction
-
-```bash
-npm install
-npm run dev        # start the dev server
-```
-Then open the website at your localhost.
-
-**Resume**
-
-Upload `resume.pdf` to the `resume` R2 bucket. The "Résumé" buttons on the site serve it via `/api/resume`.
-
-**Photography**
-
-1. Create a local `photos/` folder (git-ignored) and put your source images in it.
-2. Fill in the R2 credentials in `.env` (see `.env.example`).
-3. Run `npm run photos` to generate AVIF/WebP variants and upload them to Cloudflare R2.
-4. Add an entry (base URL, dimensions, alt, caption) to `src/data/photos.ts`.
-
-## Configuration
-
-Runtime configuration is provided through environment variables (see `.env.example` for the variable names). Values are supplied via local `.env` for scripts; in production, Cloudflare Workers secrets are set via `wrangler secret put` and Azure Functions settings are configured in the Azure portal.
-
 ## Testing
 
 The contact feature is the only stateful, user-facing piece with a real backend, so it carries two layers of automated tests. The rest of the site is static content rendered at build time, with no runtime branching to exercise.
-
-```bash
-npm test              # run both layers
-npm run test:unit     # unit tests only
-npm run test:e2e      # E2E tests only
-```
 
 ### What is tested
 

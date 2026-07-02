@@ -73,7 +73,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem; /* offset for sticky nav on anchor jumps */
+  scroll-padding-top: 4rem; /* offset for sticky nav on anchor jumps */
 }
 
 body {
