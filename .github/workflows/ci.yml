@@ -5,6 +5,29 @@ on:
     branches: [main]
 
 jobs:
+  quality:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - run: npm ci
+
+      # Generate the Worker binding types (env, R2) so astro check can
+      # type-check the API routes; worker-configuration.d.ts is gitignored.
+      - run: npm run cf-typegen
+
+      - name: Type check
+        run: npm run check
+
+      - name: Lint
+        run: npx eslint .
+
   unit:
     name: Unit Tests
     runs-on: ubuntu-latest
