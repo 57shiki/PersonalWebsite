@@ -4,6 +4,8 @@ The code behind my corner of the internet: engineering work I'm proud of, photos
 
 Built for speed: fully static HTML/CSS at load time, with JavaScript only where interaction is needed. Powered by Astro and React islands, deployed on Cloudflare Workers with a serverless contact API and a Cloudflare R2 image pipeline.
 
+100/100 Lighthouse score on Performance, Accessibility, Best Pratices, and SEO
+
 ## [→ Visit shiqihu.com](https://shiqihu.com)
 
 ## Table of contents
