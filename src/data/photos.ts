@@ -65,3 +65,25 @@ export const photos: Photo[] = [
     caption: "Tampa · bridge",
   },
 ];
+
+/** Personal shots for the contact section's photo stack — separate bucket from the gallery above. */
+export const mePhotos: Photo[] = [
+  {
+    base: "https://img-me.shiqihu.com/me-1",
+    width: 803,
+    height: 1427,
+    alt: "Standing on the shore at Montauk as the sun sets over the water.",
+  },
+  {
+    base: "https://img-me.shiqihu.com/me-2",
+    width: 1600,
+    height: 2844,
+    alt: "Showing off my undying love for a bottle of Coca-Cola.",
+  },
+  {
+    base: "https://img-me.shiqihu.com/me-3",
+    width: 608,
+    height: 1080,
+    alt: "Hiking a trail in Acadia National Park.",
+  },
+];
