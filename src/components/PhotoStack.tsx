@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, MotionConfig } from "motion/react";
-import { photos, isR2Photo, type Photo } from "../data/photos";
+import { mePhotos, isR2Photo, type Photo } from "../data/photos";
 import { r2DefaultSrc, r2Srcset } from "../lib/utils";
 
 const EASE_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -68,9 +68,9 @@ function PhotoFace({ photo }: { photo: Photo }) {
 
 export default function PhotoStack() {
   const [slots, setSlots] = useState<Record<SlotName, Photo>>({
-    left: photos[0],
-    center: photos[1],
-    right: photos[2],
+    left: mePhotos[0],
+    center: mePhotos[1],
+    right: mePhotos[2],
   });
 
   function promote(side: Side) {
